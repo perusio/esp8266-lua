@@ -1,6 +1,6 @@
 --- Application examples for the Node MCU (ESP8266) MCU.
 -- @script app.lua
--- @author Klemen Lilija lemen@relayr.de>,
+-- @author Klemen Lilija <klemen@relayr.de>,
 --         António P. P. Almeida <appa@perusio.net>
 
 --  Load the wifi and relayr-mqtt modules.
@@ -58,7 +58,7 @@ end
 --- Gets the readings from a DHT11 or DHT22 sensor.
 --
 -- @param integer pin
---   The GPIO (input) pin number
+--   The GPIO (input) pin number.
 -- @return tabĺe
 --   The table with the meaning(s) and value(s).
 local function dht_data_source(pin)
