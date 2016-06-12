@@ -58,7 +58,7 @@ broker every 2.5 seconds.
 --- Gets the readings from a DHT11 or DHT22 sensor.
 --
 -- @param integer pin
---   The GPIO (input) pin number
+--   The GPIO (input) pin number.
 -- @return tabĺe
 --   The table with the meaning(s) and value(s).
 local function dht_data_source(pin)
