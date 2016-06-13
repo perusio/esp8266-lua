@@ -182,14 +182,14 @@ NodeMCU v2 or the
 
  + For the Amica boards and others based on the CP2102 use
    [this driver](https://www.pololu.com/docs/0j7/all).
- + For the WeMos use [this driver](http://www.wemos.cc/downloads/).
+ + For the WeMos D1 mini boards and others based on the CH340 use [this driver](http://www.wemos.cc/downloads/).
  
 ### Flashing the firmware
  
  +  If using Linux or OSX install the
     [esptool](https://github.com/themadinventor/esptool).
  + If using Windows get the
-   [NodeMCU flasher for Win 32](https://github.com/nodemcu/nodemcu-flasher/raw/master/Win32/Release/ESP8266Flasher.exe).
+   [NodeMCU flasher for Win 32](https://github.com/nodemcu/nodemcu-flasher/raw/master/Win32/Release/ESP8266Flasher.exe)
    or the
    [NodeMCU flahser for Win 64](https://github.com/nodemcu/nodemcu-flasher/raw/master/Win64/Release/ESP8266Flasher.exe).
    
@@ -240,7 +240,7 @@ uses an IDE.
 working with the ESP8266. It requires the Oracle 
 [Java Runtime Environment](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
 or
-[Java Development KitK](http//www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
+[Java Development Kit](http//www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
 
 ### Command line tool: luatool
 
@@ -351,6 +351,9 @@ relayr provides hands-on workshops every second Thursday of every
 month. [Come](https://www.eventbrite.com/e/understanding-iot-protocols-using-the-esp-8266-mqtt-coap-http-and-websockets-tickets-21205029815)
 join us to see all this code in action.
 
+## TODO
+
+ + Add test for the MQTT connection/publishing/subscribing.
 
 ## License
 
@@ -378,9 +381,5 @@ join us to see all this code in action.
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
  DEALINGS IN THE SOFTWARE. 
-
-## TODO
-
- + Add test for the MQTT connection/publishing/subscribing.
  
  
