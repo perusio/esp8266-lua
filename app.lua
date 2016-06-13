@@ -32,9 +32,9 @@ local function received_data(data)
   -- Process the messages with 'Output' name.
   if data.name == 'Output' then
     if data.value then
-      gpio.write(output_pin, gpio.HIGH)
+      gpio.write(config.app.output_pin, gpio.HIGH)
     else
-      gpio.write(output_pin, gpio.LOW)
+      gpio.write(config.app.output_pin, gpio.LOW)
     end
   end
   -- Process the messages with name 'Frequency'.
