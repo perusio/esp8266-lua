@@ -11,9 +11,9 @@ local M  = {
   _NAME = 'relayr_mqtt',
   _DESCRIPTION = 'relayr API wrapper for the Node MCU MQTT module',
   _DEBUG = false, -- no debugging by default
-  _PORT = 1883, -- MQTT borker port
+  _PORT = 1883, -- MQTT broker port
   _CLIENT_ID = 'MQTT relayr API client', -- client ID
-  _SERVER = 'mqtt.relayr.io', -- MQTT borker hostname or IP
+  _SERVER = 'mqtt.relayr.io', -- MQTT broker hostname or IP
   _KEEPALIVE = 120, -- keepalive period in seconds
   _QOS = 0, -- Quality of Service
   _RETAIN = 0, -- retain messages to be delivered to new clients or not
@@ -24,25 +24,25 @@ local M  = {
                   António P. P. Almeida <appa@perusio.net>,
                   relayr GmbH
 
-                    Permission is hereby granted, free of charge, to any person
+                  Permission is hereby granted, free of charge, to any person
                   obtaining a copy of this software and associated documentation
                   files (the "Software"), to deal in the Software without
                   restriction, including without limitation the rights to use,
                   copy, modify, merge, publish, distribute, sublicense, and/or sell
                   copies of the Software, and to permit persons to whom the
                   Software is furnished to do so, subject to the following
-                    conditions:
+                  conditions:
 
-                    The above copyright notice and this permission notice shall be
-                    included in all copies or substantial portions of the Software.
-                    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-                    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-                    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-                    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-                    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-                    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-                    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-                    OTHER DEALINGS IN THE SOFTWARE. ]],
+                  The above copyright notice and this permission notice shall be
+                  included in all copies or substantial portions of the Software.
+                  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+                  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+                  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+                  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+                  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+                  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+                  OTHER DEALINGS IN THE SOFTWARE. ]],
 }
 
 -- Some local definitions.
