@@ -69,10 +69,8 @@ end
 
 --- Creates the MQTT topic string.
 --
--- @param string device_id
---   The device ID.
--- @param string type
---   One of 'md', 'config' or 'data'.
+-- @param device_id string device ID.
+-- @param type string 'cmd', 'config' or 'data'.
 -- @return string
 --   The MQTT topic.
 local function write_topic(device_id, type)
@@ -82,8 +80,7 @@ end
 --- Subscribes to given MQTT topics. By default susbcribes to 'cmd' and 'config'
 --  MQTT topics from the relayr broker.
 --
--- @param table topics
---   The topic(s) to be subscribed to.
+-- @param topics table topic(s) to be subscribed to.
 -- @return nothing
 --   Side effects only.
 local function subscribe_topics(topics)
@@ -114,8 +111,7 @@ local incoming_data
 --- Just copies the given user callback to the incoming data
 -- callback (subscriptions)
 --
--- @param function callback
---   Function to be used as an incoming data callback.
+-- @param callback function for incoming data callback.
 -- @return nothing
 --  Side effects only.
 function M.register_data_listener(callback)
@@ -155,8 +151,7 @@ end
 
 --- Sends data to relayr cloud. It publishes
 --
--- @param data
---   Lua table including 'meaning' and 'value'.
+-- @param data table with meaning(s) and value(s).
 -- @return nothing
 --   Side effects only.
 function M.send(data)
@@ -181,10 +176,8 @@ end
 
 --- Establishes a connection to the relayr cloud MQTT broker.
 --
--- @param table config
---   MQTT configuration table with: username, password, etc.
--- @param function callback
---   Callback invoked when the client connects.
+-- @param config table MQTT username, password, etc.
+-- @param callback function invoked when the client connects.
 -- @return nothing
 --   Side effects only.
 function M.connect(config, callback, subs_topics)
