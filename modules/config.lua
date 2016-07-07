@@ -75,7 +75,8 @@ M.mqtt = {
 --- @table: the application configuration.
 M.app = {
   -- Number of the GPIO pin used as a digital output.
-  output_pin = 4,
+  -- D4 for the WeMos, D0 for the NodeMCU.
+  output_pin = 4, -- WeMos assumed
   -- Timer (index) used for sending the data.
   data_timer = 2,
   -- Period of data publishing (every X ms).
