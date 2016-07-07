@@ -75,14 +75,17 @@ M.mqtt = {
 --- @table: the application configuration.
 M.app = {
   -- Number of the GPIO pin used as a digital output.
-  output_pin = 0,
+  output_pin = 4,
   -- Timer (index) used for sending the data.
   data_timer = 2,
   -- Period of data publishing (every X ms).
   data_period = 2500,
   -- WiFi connection setup timer index.
   wifi_setup_timer = 1,
+  -- CoAP server node timer index.
+  coap_server_timer = 3,
 }
+
 
 --[[
   **************************************************
