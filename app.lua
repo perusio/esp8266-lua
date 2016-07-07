@@ -9,7 +9,8 @@ local relayr = require 'relayr_mqtt'
 local config = require 'config'
 -- Load the DS18B20 module.
 local ds = require 'ds18b20'
-
+-- Load the CoAP node module.
+local coapn = require 'coap_node'
 
 -- Local definitions.
 local format = string.format
@@ -22,7 +23,8 @@ local alarm = tmr.alarm
 ]]--
 
 --- Callback triggered by received data from 'cmd' and 'config'
---  topics. See below for setup function.
+--  topics. By default just turns on and off the onboard LED in pin D4.
+--
 -- @param data table data received via MQTT on both topics.
 -- @return nothing
 --   Side effects only.
@@ -80,7 +82,7 @@ local function dht_data_source(pin)
 end
 
 -- Digital I/O pin to use for sending data from the DHT11/22 sensor.
-local dht_pin = 5
+local dht_pin = 3
 
 --- Wrapper for sending data from the DHT11/22 sensors
 --- to the relayr cloud.
@@ -118,7 +120,6 @@ local function send_ds18b20_data()
   relayr.send(ds18b20_data_source(ds18b20_pin))
 end
 
-
 --- Setup whatever you need in order to send
 --  data and connect to the relayr cloud to send
 --  and receive data.
@@ -130,7 +131,7 @@ end
 --  Side effects only.
 local function setup(subs_topics, send_callback)
   -- Setup GPIO as an output.
-  -- gpio.mode(output_pin, gpio.OUTPUT)
+  gpio.mode(config.app.output_pin, gpio.OUTPUT)
   -- Register the function (callback) in which you
   -- whish to process incoming data (commands).
   relayr.register_data_listener(received_data)
