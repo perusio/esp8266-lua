@@ -7,10 +7,6 @@
 local wifi_setup = require 'wifi_launch'
 local relayr = require 'relayr_mqtt'
 local config = require 'config'
--- Load the DS18B20 module.
-local ds = require 'ds18b20'
--- Load the CoAP node module.
-local coapn = require 'coap_node'
 
 -- Local definitions.
 local format = string.format
@@ -21,6 +17,12 @@ local alarm = tmr.alarm
   ************ User defined functions. *************
   **************************************************
 ]]--
+
+-- Number of the GPIO pin used as a digital output.
+-- D4 for the WeMos, D0 for the NodeMCU onboard LED.
+local output_pin = 4 -- WeMos assumed
+-- Digital I/O pin to use for sending data from the DHT11/22 sensor.
+local dht_pin = 3
 
 --- Callback triggered by received data from 'cmd' and 'config'
 --  topics. By default just turns on and off the onboard LED in pin D4.
@@ -34,40 +36,29 @@ local function received_data(data)
                data.name,
                tostring(data.value)))
   -- Process the messages with 'Output' name.
-  if data.name == 'Output' then
+  if data.name == 'output' then
     if data.value then
-      gpio.write(config.app.output_pin, gpio.HIGH)
+      gpio.write(output_pin, gpio.HIGH)
     else
-      gpio.write(config.app.output_pin, gpio.LOW)
+      gpio.write(output_pin, gpio.LOW)
     end
   end
   -- Process the messages with name 'Frequency'.
-  if data.name == 'Frequency' then
+  if data.name == 'frequency' then
     -- Update the alarm interval for sending data to relayr cloud.
     tmr.interval(config.app.data_timer, data.value)
   end
 end
 
---- Gets a reading from the ADC and returns is as a table.
+--- Gets the readings from sensors.
 --
--- @return table
---   The table with the meaning(s) and value(s).
-local function adc_data_source()
-  -- Read the ADC input.
-  local reading = adc.read(0)
-  -- Return the values.
-  return { meaning = 'ADC input', value = reading }
-end
-
---- Gets the readings from a DHT11 or DHT22 sensor.
---
--- @param integer pin
---   The GPIO (input) pin number.
 -- @return tabĺe
 --   The table with the meaning(s) and value(s).
-local function dht_data_source(pin)
+local function acquire_data()
   -- Read the data from the DHT sensor.
-  local status, temp, hum = dht.read(pin)
+  local status, temp, hum = dht.read(dht_pin)
+  -- Read the ADC data.
+  local adc_reading = adc.read(0)
   -- Retunr the values.
   return{
     {
@@ -78,46 +69,20 @@ local function dht_data_source(pin)
       meaning = 'humidity',
       value = hum
     },
+    {
+      meaning = 'adc',
+      value = adc_reading
+    },
   }
 end
 
--- Digital I/O pin to use for sending data from the DHT11/22 sensor.
-local dht_pin = 3
-
---- Wrapper for sending data from the DHT11/22 sensors
+--- Wrapper for sending data from sensor readings
 --- to the relayr cloud.
 --
 -- @return nothing.
 --   Side effects only.
-local function send_dht_data()
-  relayr.send(dht_data_source(dht_pin))
-end
-
---- Gets the readings from a DS18B20 sensor.
---
--- @param pin integer GPIO (input) pin number.
--- @return tabĺe
---   The table with meaning and value.
-local function ds18b20_data_source(pin)
-  -- Setup the sensor.
-  ds.setup(ds18b20_pin)
-  -- Get the temperature in Celsius.
-  return {
-    meaning = 'temperature',
-    value = ds.read()
-  }
-end
-
--- Digital I/O pin to use for sending data from the DS18B20 sensor.
-local ds18b20_pin = 5
-
---- Wrapper for sending data from the DS18B20 sensor
---- to the relayr cloud.
---
--- @return nothing.
---   Side effects only.
-local function send_ds18b20_data()
-  relayr.send(ds18b20_data_source(ds18b20_pin))
+local function send_data()
+  relayr.send(acquire_data())
 end
 
 --- Setup whatever you need in order to send
@@ -151,9 +116,6 @@ local function setup(subs_topics, send_callback)
   )
 end
 
--- Setup WiFi and connect to it.
-wifi_setup.start(config.wifi)
-
 --- Callback that checks the WiFi link
 -- is established and prints the IP address
 -- when done.
@@ -173,9 +135,12 @@ function wifi_wait_ip()
     -- Execute the 'setup' function. Right now we use the DS18B20 as
     -- the data source. Change to whatever data source you use
     -- DHT11/22, etc.
-    setup(subs_topics, send_ds18b20_data)
+    setup(subs_topics, send_data)
   end
 end
+
+-- Setup WiFi and connect to it.
+wifi_setup.start(config.wifi)
 
 -- Run the event loop for establishing a WiFi connection.
 alarm(config.app.wifi_setup_timer,
