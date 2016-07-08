@@ -179,6 +179,6 @@ end
 
 -- Run the event loop for establishing a WiFi connection.
 alarm(config.app.wifi_setup_timer,
-      config.wifi.timer_period,
+      config.wifi.data_period,
       tmr.ALARM_AUTO,
       wifi_wait_ip)
