@@ -180,8 +180,11 @@ publish to the MQTT broker-
     select the **dev** branch and the following modules:
     
     + [CJSON](http://nodemcu.readthedocs.io/en/master/en/modules/cjson/)
-    + [DHT](http://nodemcu.readthedocs.io/en/master/en/modules/dht/)
+    + [CoAP](http://nodemcu.readthedocs.io/en/dev/en/modules/coap/)
     + [MQTT](http://nodemcu.readthedocs.io/en/master/en/modules/mqtt/)
+    
+    * If you're using the DHT11/22 sensor select also:
+      [DHT](http://nodemcu.readthedocs.io/en/master/en/modules/dht/)
 
     the other needed modules should be **pre-selected**
     
@@ -262,12 +265,13 @@ For example, in Linux:
 You should see the blue led on the board blinking as the counter
 progresses up to 100% when the flashing completes.
 
+**N.B.:** Use the **float** version of the firmware when flashing.
+
 #### Flashing on Windows
 
 Follow the instructions on the
 [README](https://github.com/nodemcu/nodemcu-flasher/) for the github
 project.
-
 
 ## Communicating with the device and uploading code
 
@@ -300,8 +304,7 @@ If on the command line:
  1. Open a serial communications program like
     [picocom](https://github.com/npat-efault/picocom) in LInux and OSX
     or [Putty](http://www.putty.org/) in Windows.
-    
-    
+        
         picocom -b 115200 /dev/ttyUSB0
         
     adapt the the name of the serial device the ESP8266 shows up as.
@@ -339,10 +342,10 @@ On the command line:
     upload. If on the command line with `luatool`
 
     
-        /luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/modules/wifi_launch.lua 
-        /luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/modules/relayr_mqtt.lua
-        /luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/modules/ds18b20.lua 
-        /luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/app.lua
+        ./luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/modules/wifi_launch.lua 
+        ./luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/modules/relayr_mqtt.lua
+        ./luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/modules/ds18b20.lua 
+        ./luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/app.lua
  
  3. Edit the `config.lua` file and add your WiFi credentials and the
     credentials you get from the relayr
@@ -379,7 +382,7 @@ The script `wifi_test.lua` is a test for the WiFi setup.
 
  1. Upload the file to the device: 
 
-     /luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/t/wifi:_test.lua
+     ./luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/t/wifi:_test.lua
         
  2. Run: `dofile('wifi_test.lua')`.
  3. You should see the assigned IP address, netmask and gateway IP
@@ -430,6 +433,73 @@ end
 **Customize** it to your liking. The `Frequency` is not the frequency
 but rather the **period** between the each LED blink.
 
+
+## Building sensor nodes using CoAP
+
+[CoAP](https://tools.ietf.org/html/rfc7252), **C**onstrained **A**pplication
+**P**rotocol takes inspiration from REST and HTTP. It is being
+developed by the
+[Constrained Restful Environments](https://tools.ietf.org/wg/core)
+(CoRE) group of the [IETF](https://ietf.org). 
+
+CoAP makes it easy to create a server and/or a client that runs on a
+constrained devices. It goes in the direction of sensor nodes being a
+network of **peers** rather than fit into a more _traditional_
+server-client client pattern of network elements.
+
+### Building a simple server reading temperature from a DS18B20
+
+
+  1. Upload the `coap_ds18b20` module to the ESP8266.
+
+        ./luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/modules/coap_ds18b20.lua
+
+  2. Upload the code for the CoAP test:
+  
+        ./luatool/luatool.py -p /dev/ttyUSB0 -b 115200 -f /path/to/ESP8266_Lua/t/coap_ds18b20_test.lua
+    
+  3. Run the test script:
+
+        dofile('coap_ds18b20_test.lua')
+
+  4. Now you have a CoAP **server** running on the ESP8266 that can be
+     reached at the URL:
+     
+        coap://<ip_address>/v1/v/t
+
+     where `<ip_address>` is the IP address of the ESP8266. If not
+     visible in the serial console communicating with the device you
+     can get it **anytime** with:
+     
+        print(wifi.sta.getip())
+
+   
+     it prints the current IP address of the killer the venue in question and two
+     more facts: the **netmask** and the **gateway** IP
+     address. Pressuposes that you have run `dofile('app.lua)` as
+     explained above. If not and you want to use it **standalone**,
+     just do the above WiFi testing.
+
+  5. Now use a CoAP client like
+     [Copper](https://addons.mozilla.org/en-US/firefox/addon/copper-270430/)
+     on Firefox and point it to the above URL. You should get a JSON
+     reading of the temperature.
+     
+     If using a CLI client like
+     [coap-cli](https://github.com/mcollina/coap-cli) for NodeJS, e.g.,
+     
+     
+        coap get coap://10.211.2.49/v1/v/t
+
+     prints:
+     
+        (2.05)  {"meaning":"temperature","value":26.5625}
+
+  Bear in mind that this is just the **beginning** of all the things
+  you can do with CoAP on the ESP8266, in spite of the **incomplete**
+  implementation **currently** available.
+  
+  
 ## Going further
 
 relayr provides hands-on workshops every second Thursday of every
