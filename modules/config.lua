@@ -53,9 +53,9 @@ end
 --  @table: WiFi network SSID and password/psk.
 M.wifi = {
   -- Replace with the desired network SSID.
-  ssid = '<my SSID>',
+  ssid = 'CiscoLive2016',
   -- Replace with the desired network SSID.
-  psk = '<psk here>',
+  psk = '@ciscolive',
   -- WiFi configuration timer period in ms.
   timer_period = 2500,
 }
@@ -83,8 +83,6 @@ M.app = {
   data_period = 2500,
   -- WiFi connection setup timer index.
   wifi_setup_timer = 1,
-  -- CoAP server node timer index.
-  coap_server_timer = 3,
 }
 
 

@@ -93,6 +93,9 @@ local function send_dht_data()
   relayr.send(dht_data_source(dht_pin))
 end
 
+-- Digital I/O pin to use for sending data from the DS18B20 sensor.
+local ds18b20_pin = 5
+
 --- Gets the readings from a DS18B20 sensor.
 --
 -- @param pin integer GPIO (input) pin number.
@@ -107,9 +110,6 @@ local function ds18b20_data_source(pin)
     value = ds.read()
   }
 end
-
--- Digital I/O pin to use for sending data from the DS18B20 sensor.
-local ds18b20_pin = 5
 
 --- Wrapper for sending data from the DS18B20 sensor
 --- to the relayr cloud.
@@ -179,6 +179,6 @@ end
 
 -- Run the event loop for establishing a WiFi connection.
 alarm(config.app.wifi_setup_timer,
-      config.wifi.data_period,
+      config.wifi.timer_period,
       tmr.ALARM_AUTO,
       wifi_wait_ip)
