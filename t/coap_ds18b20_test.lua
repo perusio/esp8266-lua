@@ -1,3 +1,8 @@
+--- Testing a CoAP server providing data from a DS18B20 sensor
+-- @script coap_ds18b20_test.lua
+-- @author António P. P. Almeida <appa@perusio.net>
+--
+
 -- Load the application configuration.
 local app_config = require('config').app
 -- Load the CoAP DS18B20 module.
