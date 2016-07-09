@@ -482,8 +482,9 @@ server-client client pattern of network elements.
 
   5. Now use a CoAP client like
      [Copper](https://addons.mozilla.org/en-US/firefox/addon/copper-270430/)
-     on Firefox and point it to the above URL. You should get a JSON
-     reading of the temperature.
+     on Firefox and point it to the above URL. You should get a
+     reading of the temperature in JSON format.
+     
      
      If using a CLI client like
      [coap-cli](https://github.com/mcollina/coap-cli) for NodeJS, e.g.,
