@@ -9,8 +9,6 @@ local relayr = require 'relayr_mqtt'
 local config = require 'config'
 -- Load the DS18B20 module.
 local ds = require 'ds18b20'
--- Load the CoAP node module.
-local coapn = require 'coap_node'
 
 -- Local definitions.
 local format = string.format
