@@ -5,6 +5,7 @@
 
 --  Load the wifi and relayr-mqtt modules.
 local wifi_setup = require 'wifi_launch'
+local relayr = require 'relayr_mqtt'
 local config = require 'config'
 
 -- Local definitions.
@@ -20,9 +21,34 @@ local alarm = tmr.alarm
 -- Number of the GPIO pin used as a digital output.
 -- D4 for the WeMos, D0 for the NodeMCU onboard LED.
 local output_pin = 4 -- WeMos assumed
-local output_state = true
 -- Digital I/O pin to use for sending data from the DHT11/22 sensor.
 local dht_pin = 3
+
+--- Callback triggered by received data from 'cmd' and 'config'
+--  topics. By default just turns on and off the onboard LED in pin D4.
+--
+-- @param data table data received via MQTT on both topics.
+-- @return nothing
+--   Side effects only.
+local function received_data(data)
+  -- Print the name and value in received JSON message.
+  print(format('Received: (name: %s, value: %s).',
+               data.name,
+               tostring(data.value)))
+  -- Process the messages with 'Output' name.
+  if data.name == 'output' then
+    if data.value then
+      gpio.write(output_pin, gpio.HIGH)
+    else
+      gpio.write(output_pin, gpio.LOW)
+    end
+  end
+  -- Process the messages with name 'Frequency'.
+  if data.name == 'frequency' then
+    -- Update the alarm interval for sending data to relayr cloud.
+    tmr.interval(config.app.data_timer, data.value)
+  end
+end
 
 --- Gets the readings from sensors.
 --
@@ -30,9 +56,9 @@ local dht_pin = 3
 --   The table with the meaning(s) and value(s).
 local function acquire_data()
   -- Read the data from the DHT sensor.
-  status, temp, hum = dht.read(dht_pin)
+  local status, temp, hum = dht.read(dht_pin)
   -- Read the ADC data.
-  adc_reading = adc.read(0)
+  local adc_reading = adc.read(0)
   -- Retunr the values.
   return{
     {
@@ -50,23 +76,13 @@ local function acquire_data()
   }
 end
 
---- Gets the readings from sensors.
+--- Wrapper for sending data from sensor readings
+--- to the relayr cloud.
 --
--- @return string
---   A CoAP string response.
-function foo(payload)
-
-  -- Switch the LED.
-  if output_state then
-    gpio.write(output_pin, gpio.HIGH)
-    output_state = false
-  else
-    gpio.write(output_pin, gpio.LOW)
-    output_state = true
-  end
-
-  local respond = "Foo switched a LED."
-  return respond
+-- @return nothing.
+--   Side effects only.
+local function send_data()
+  relayr.send(acquire_data())
 end
 
 --- Setup whatever you need in order to send
@@ -78,31 +94,26 @@ end
 --
 -- @return nothing.
 --  Side effects only.
-local function setup()
-
-  -- Setup the GPIO as an output.
+local function setup(subs_topics, send_callback)
+  -- Setup GPIO as an output.
   gpio.mode(output_pin, gpio.OUTPUT)
-
-  -- Create a server instance on 5683 port.
-  cs = coap.Server()
-  cs:listen(5683)
-
-  -- Variables.
-  cs:var("adc_reading") -- get coap://192.168.18.103:5683/v1/v/myvar will return the value of 'adc_reading'
-  cs:var("temp")
-  cs:var("hum")
-  -- Get all at once.
-  someContent ='[1,2,3]'
-  cs:var("someContent", coap.JSON) -- sets content type to json
-
-  -- function should tack one string, return one string.
-  cs:func("foo") -- Post coap://192.168.18.103:5683/v1/f/foo will call foo fucion.
-
-  alarm(config.app.coap_server_timer,
-    config.app.data_period,
-    tmr.ALARM_AUTO,
-    acquire_data)
-
+  -- Register the function (callback) in which you
+  -- whish to process incoming data (commands).
+  relayr.register_data_listener(received_data)
+  -- Connect to relayr Cloud.
+  relayr.connect(
+    -- Pass the MQTT configuration.
+    config.mqtt,
+    -- Callback when the connection is established.
+    -- Invoke this function every app_config.data_period ms.
+    function()
+      alarm(config.app.data_timer,
+            config.app.data_period,
+            tmr.ALARM_AUTO,
+            send_callback)
+    end,
+    subs_topics
+  )
 end
 
 --- Callback that checks the WiFi link
@@ -119,8 +130,12 @@ function wifi_wait_ip()
     tmr.unregister(config.app.wifi_setup_timer)
     local ip, mask, gw = wifi.sta.getip()
     print(format('ip: %s mask: %s gw: %s.', ip, mask, gw))
-    -- Setup the CoAP server.
-    setup()
+    -- Setup the subscription topics for MQTT.
+    local subs_topics = {}
+    -- Execute the 'setup' function. Right now we use the DS18B20 as
+    -- the data source. Change to whatever data source you use
+    -- DHT11/22, etc.
+    setup(subs_topics, send_data)
   end
 end
 

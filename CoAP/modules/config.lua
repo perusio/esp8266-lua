@@ -80,8 +80,6 @@ M.app = {
   data_period = 2500,
   -- WiFi connection setup timer index.
   wifi_setup_timer = 1,
-  -- CoAP server node timer index.
-  coap_server_timer = 3,
 }
 
 
