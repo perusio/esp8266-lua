@@ -11,9 +11,9 @@ local M  = {
   _NAME = 'relayr_mqtt',
   _DESCRIPTION = 'relayr API wrapper for the Node MCU MQTT module',
   _DEBUG = false, -- no debugging by default
-  _PORT = 1883, -- MQTT broker port
+  _PORT = 8883, -- MQTT broker port
   _CLIENT_ID = 'MQTT relayr API client', -- client ID
-  _SERVER = 'mqtt.relayr.io', -- MQTT broker hostname or IP
+  _SERVER = 'cloud-mqtt.relayr.io', -- MQTT broker hostname or IP
   _KEEPALIVE = 120, -- keepalive period in seconds
   _QOS = 0, -- Quality of Service
   _RETAIN = 0, -- retain messages to be delivered to new clients or not
@@ -47,7 +47,7 @@ local M  = {
 
 -- Some local definitions.
 local format = string.format
-local cjson = cjson
+local sjson = sjson
 local mqtt = mqtt
 local pcall = pcall
 local print = print
@@ -70,23 +70,23 @@ end
 --- Creates the MQTT topic string.
 --
 -- @param device_id string device ID.
--- @param type string 'cmd', 'config' or 'data'.
+-- @param type string 'commands', 'measurements' or 'alerts'.
 -- @return string
 --   The MQTT topic.
 local function write_topic(device_id, type)
-  return format('/v1/%s/%s', device_id, type)
+  return format('devices/%s/%s', device_id, type)
 end
 
---- Subscribes to given MQTT topics. By default susbcribes to 'cmd' and 'config'
+--- Subscribes to given MQTT topics. By default susbcribes to 'commands' and 'config'
 --  MQTT topics from the relayr broker.
 --
 -- @param topics table topic(s) to be subscribed to.
 -- @return nothing
 --   Side effects only.
 local function subscribe_topics(topics)
-  -- Subscribe to the 'cmd' and 'config' MQTT topics if not
+  -- Subscribe to the 'commands' MQTT topic if not
   -- explicitly given.
-  local t = topics or { 'cmd', 'config' }
+  local t = topics or { 'commands' }
   -- Loop over all subscription topics.
   local tp = {}
   for _, v in ipairs(t) do
@@ -99,7 +99,7 @@ local function subscribe_topics(topics)
     -- Callback function that is innvoked upon successful subscription.
     function(conn)
       if M._DEBUG then
-        print(format('Succesfully subscribed to topics: %s.', cjson.encode(t)))
+        print(format('Succesfully subscribed to topics: %s.', sjson.encode(t)))
       end
   end)
 end
@@ -133,7 +133,7 @@ local function register_receive_callback()
                   print(format('Data received: %s', data))
                 end
                 -- Decode the JSON data.
-                local ok, t = pcall(cjson.decode, data)
+                local ok, t = pcall(sjson.decode, data)
                 -- Check if callback function is registered
                 -- in the main application.
                 if ok then
@@ -156,7 +156,7 @@ end
 --   Side effects only.
 function M.send(data)
   -- Encode the data into JSON message and publish it.
-  local ok, json = pcall(cjson.encode, data)
+  local ok, json = pcall(sjson.encode, data)
   -- If the JSON encoding succeeded then publish the data.
   if ok then
     client:publish(
