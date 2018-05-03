@@ -17,7 +17,7 @@ local M  = {
   _KEEPALIVE = 120, -- keepalive period in seconds
   _QOS = 0, -- Quality of Service
   _RETAIN = 0, -- retain messages to be delivered to new clients or not
-  _SECURE = 0, -- secure connection or not (MQTT over TLS or not)
+  _SECURE = 1, -- secure connection or not (MQTT over TLS or not)
   _AUTORECONNECT = 0, -- to auto reconnect or not
   _COPYRIGHT = [[
                   Copyright (c) 2016 Klemen Lilija <klemen@relayr.de>,

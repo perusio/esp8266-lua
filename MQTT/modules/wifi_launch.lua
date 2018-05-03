@@ -64,9 +64,9 @@ local function wifi_setup(t)
     -- Loop over all networks.
     for key, value in pairs(t) do
       -- Connect if the network defined on the configuration file.
-      if M._CONFIG.ssid == key then
+      if M._CONFIG.config.ssid == key then
         w.setmode(w.STATION);
-        w.sta.config(key, M._CONFIG.psk)
+        w.sta.config(M._CONFIG.config)
         w.sta.connect()
         -- Set the WiFi physical mode.
         local mode = w.getphymode()
